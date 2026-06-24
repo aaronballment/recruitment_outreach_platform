@@ -171,8 +171,29 @@ def recruiter_keyword_check(name: str) -> bool:
     
 def blacklist_check(domain: str) -> bool:
     '''
+    Returns True if the domain is blacklisted.
     
+    Parameters:
+    - domain (str): the domain being checked
+    
+    Returns:
+    - bool: True if blacklisted, False if not.
+    
+    >>> config.BLACKLIST = {"abc.com", "xyz.com.au"}
+    
+    >>> blacklist_check('abc.com')
+    True
+    
+    >>> blacklist_check('abc.com.au')
+    False
+    
+    >>> blacklist_check('')
+    False
     '''
+    
+    BLACKLIST = config.BLACKLIST
+    
+    return bool(domain in BLACKLIST)
     
 def qualification() -> bool:
     '''
