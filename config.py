@@ -40,3 +40,11 @@ BLACKLIST = {
     "australconstruction.com.au", "lunainc.com", "greenrockadvisory.com.au", 
     "neilsonfs.com", "finance4nurses.com.au", "resolvefinance.com.au"
 }
+
+VALID_TITLES = {
+    "sale", "business development", "account", "success", "lead", "telemarketer"
+}
+
+INVALID_TITLES = {
+    "retail", "vehicle", "car", "realestate", "automotive", "casual"
+}

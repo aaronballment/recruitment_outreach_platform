@@ -23,6 +23,7 @@ def clean_company_name(name: str) -> str:
     
     return clean_name.title()
 
+
 def get_first_name(full_name: str) -> str:
     '''
     Returns the persons first name
@@ -38,6 +39,7 @@ def get_first_name(full_name: str) -> str:
     names = full_name.strip().split()
     
     return names[0].title()
+
 
 def normalise_url(url: str) -> str:
     '''
@@ -83,6 +85,7 @@ def normalise_url(url: str) -> str:
     
     else:
         return ".".join(domain_parts[-2:])
+    
 
 def normalise_job_location(job_location: str) -> str:
     '''
@@ -116,6 +119,7 @@ def normalise_job_location(job_location: str) -> str:
     
     return job_location.split(',')[0]
 
+
 def job_posting(job_title: str, job_location: str='') -> str:
     '''
     Returns the job_posting variable "<job_title> in <job_location>".
@@ -134,6 +138,7 @@ def job_posting(job_title: str, job_location: str='') -> str:
         return job_title
     
     return f'{job_title} in {job_location}'
+
 
 def recruiter_keyword_check(name: str) -> bool:
     '''
@@ -169,7 +174,8 @@ def recruiter_keyword_check(name: str) -> bool:
     
     return bool(re.search(pattern, name.lower()))
     
-def blacklist_check(domain: str) -> bool:
+    
+def is_blacklisted(domain: str) -> bool:
     '''
     Returns True if the domain is blacklisted.
     
@@ -181,30 +187,95 @@ def blacklist_check(domain: str) -> bool:
     
     >>> config.BLACKLIST = {"abc.com", "xyz.com.au"}
     
-    >>> blacklist_check('abc.com')
+    >>> is_blacklisted('abc.com')
     True
     
-    >>> blacklist_check('abc.com.au')
+    >>> is_blacklisted('abc.com.au')
     False
     
-    >>> blacklist_check('')
+    >>> is_blacklisted('')
     False
     '''
     
     BLACKLIST = config.BLACKLIST
     
     return bool(domain in BLACKLIST)
+
+
+def is_title_invalid(job_title: str) -> bool:
+    '''
+    Returns True if <job_title> is a invalid title.
     
-def qualification() -> bool:
+    Parameters:
+    - job_title (str): unchecked job title.
+    
+    Returns:
+    - bool: True if invalid, False if not.
+    
+    >>> config.VALID_TITLES = {"sales"}
+    
+    >>> config.INVALID_TITLES = {"retail", "real estate"}
+    
+    >>> is_title_invalid('retail sales manager')
+    True
+    
+    >>> is_title_invalid('sales representative')
+    False
+    
+    >>> is_title_invalid('')
+    False
+    '''
+    
+    VALID_TITLES = config.VALID_TITLES
+    
+    INVALID_TITLES = config.INVALID_TITLES
+    
+    if not isinstance(job_title, str) or not job_title.strip():
+        return False
+    
+    clean_title = job_title.lower()
+    
+    for invalid in INVALID_TITLES:
+        if re.search(fr'\b{invalid}\b', clean_title):
+            return True
+        
+    for valid in VALID_TITLES:
+        if re.search(fr'\b{valid}\b', clean_title):
+            return False
+    
+    return True
+            
+def qualification(job_title: str, company_name: str, domain: str) -> bool:
     '''
     Returns True if the company pass all qualification steps.
+    
+    Preconditions: ALL parameters are non empty strings.
+    
+    Parameters:
+    - job_title (str): job title in job ad.
+    - company_name (str): company name to be checked for recruimtent keywords
+    - domain (str): domain to be checked in blacklist and recruitment keywords
+    
+    Returns:
+    - bool: True if passes all qualifications, False if not
+    
+    >>> qualification('sales manager', 'recruitmentxyz', 'recruitmentxyz.com')
+    False
+    
+    >>> qualification('sales manager', 'abcfinance', 'abcfinance.com')
+    True
     '''
     
-    
-    
+    return not (
+        recruiter_keyword_check(company_name) or 
+        recruiter_keyword_check(domain) or
+        is_blacklisted(domain) or 
+        is_title_invalid(job_title)
+    )
     
 
 #-----Testing:
 if __name__ == '__main__':
+    
     import doctest
     doctest.testmod(verbose=True)
