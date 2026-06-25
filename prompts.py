@@ -1,5 +1,5 @@
 #Web Search Prompts
-def domain_search(company_name: str, job_ad: str) -> str:
+def domain_search(company_name: str, job_ad: str='') -> str:
     '''
     Prompt to find company domain. 
     
