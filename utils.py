@@ -1,5 +1,6 @@
 import re
 import config
+import tldextract
 
 def clean_company_name(name: str) -> str:
     '''
@@ -73,18 +74,12 @@ def normalise_url(url: str) -> str:
     if not isinstance(url, str) or '.' not in url:
         return ''
     
-    url_clean = re.sub(r'^(https?://)?(www\.)?', '', url.strip().lower())
+    extracted = tldextract.extract(url.strip().lower())
     
-    core_domain = url_clean.split('/')[0]
+    if not extracted.domain or not extracted.suffix:
+        return ''
     
-    domain_parts = core_domain.split('.')
-    
-    if len(domain_parts) >= 3 and (f'{domain_parts[-2]}.{domain_parts[-1]}' 
-                                   in config.MULTI_PART_TLDS):
-        return ".".join(domain_parts[-3:])
-    
-    else:
-        return ".".join(domain_parts[-2:])
+    return f'{extracted.domain}.{extracted.suffix}'
     
 
 def normalise_job_location(job_location: str) -> str:
@@ -271,6 +266,25 @@ def qualification(job_title: str, company_name: str, domain: str) -> bool:
         recruiter_keyword_check(domain) or
         is_blacklisted(domain) or 
         is_title_invalid(job_title)
+    )
+    
+def non_empty(job_title: str, company_name: str, domain: str, job_ad_url: str
+              ) -> bool:  
+    '''
+    Returns True if all required fields and non-empty strings.
+    
+    Parameters:
+    job_title (str): job title related to job ad
+    company_name (str): name of the company advertising
+    domain (str): domain associated with advertising company
+    job_ad_url (str): the link to the job ad
+    '''
+    
+    return bool(
+        isinstance(job_title, str) and job_title.strip() and
+        isinstance(company_name, str) and company_name.strip() and
+        isinstance(domain, str) and domain.strip() and
+        isinstance(job_ad_url, str) and job_ad_url.strip()
     )
     
 
