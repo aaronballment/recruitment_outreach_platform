@@ -121,3 +121,42 @@ Ensure your answer is 110% correct.
 There is no room for error. Think through your answers carefully and thoroughly.
 '''
 )
+    
+def email_type(job_ad_email: str) -> str:
+    '''
+    Prompt to classify the job ad email
+    
+    ONLY for use with generate_content()
+    '''
+    return(f"""#CONTEXT#
+
+You are an AI assistant tasked with classifying email addresses as either company emails (generic, e.g., info@company.com, contact@company.com) or work emails for a specific person (e.g., john.doe@company.com).
+
+#OBJECTIVE#
+Determine whether the email is a company email or a work email for a specific person.
+
+#INSTRUCTIONS#
+1. Analyze the structure of the email address.
+2. If the email address contains a personal name (e.g., first name, last name, initials), classify it as a work email for a specific person.
+3. If the email address is generic (e.g., info@, contact@, sales@, support@, careers@, jobs@, admin@, hello@, etc.), classify it as a company email.
+4. Use only the information in  and do not make assumptions based on other columns.
+
+5. Return only one of the following outputs: "Company email" or "Work email". DO NOT OUTPUT ANYTHING ELSE.
+
+#EXAMPLES#
+Input: info@acme.com
+Output: Company email
+
+Input: jane.smith@acme.com
+Output: Work email
+
+Input: careers@startup.io
+Output: Company email
+
+Input: jdoe@bigcorp.com
+Output: Work email
+
+#INPUTS:
+email address: {job_ad_email}
+    """
+    )
